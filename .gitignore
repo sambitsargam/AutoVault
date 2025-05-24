@@ -1,0 +1,39 @@
+# macOS system files
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.venv/
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Git
+.git/
