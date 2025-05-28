@@ -6,6 +6,14 @@ const OpenAI = require("openai");
 
 const app = express();
 app.use(express.json());
+// add cors access to all
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
 
 // Initialize the OpenAI client
 const openai = new OpenAI({
