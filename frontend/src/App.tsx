@@ -10,29 +10,29 @@ import WalletDetails from './components/WalletDetails';
 import { ArrowRight, Shield, Zap, BarChart } from 'lucide-react';
 
 function App() {
-  const { 
-    provider, 
-    account, 
-    network, 
+  const {
+    provider,
+    account,
+    network,
     balance,
     usdceBalance,
     transactions,
-    isConnecting, 
-    connectWallet 
+    isConnecting,
+    connectWallet
   } = useWallet();
-  
-  const { 
-    tvl, 
-    apys, 
-    recommendation, 
-    reason, 
-    userShares, 
-    shareValue, 
+
+  const {
+    tvl,
+    apys,
+    recommendation,
+    reason,
+    userShares,
+    shareValue,
     isLoading,
     isTransacting,
     error,
     advisorError,
-    handleAction 
+    handleAction
   } = useVault(provider, account);
 
   const handleDeposit = async (amount: string) => {
@@ -48,13 +48,13 @@ function App() {
     return (
       <ThemeProvider>
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-          <Header 
-            network={network} 
-            account={account} 
-            isConnecting={isConnecting} 
-            onConnect={connectWallet} 
+          <Header
+            network={network}
+            account={account}
+            isConnecting={isConnecting}
+            onConnect={connectWallet}
           />
-          
+
           <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Hero Section */}
             <div className="py-20 text-center">
@@ -132,47 +132,64 @@ function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-        <Header 
-          network={network} 
-          account={account} 
-          isConnecting={isConnecting} 
-          onConnect={connectWallet} 
+        <Header
+          network={network}
+          account={account}
+          isConnecting={isConnecting}
+          onConnect={connectWallet}
         />
-        
+
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <VaultOverview 
-                tvl={tvl} 
-                userShares={userShares} 
+              <VaultOverview
+                tvl={tvl}
+                userShares={userShares}
                 shareValue={shareValue}
                 isLoading={isLoading}
               />
-              
-              <StrategyList 
-                strategies={apys} 
-                recommendation={recommendation} 
+
+              <StrategyList
+                strategies={apys}
+                recommendation={recommendation}
                 reason={reason}
                 advisorError={advisorError}
                 isLoading={isLoading}
               />
-              
+
               <WalletDetails
                 balance={balance}
                 usdceBalance={usdceBalance}
                 transactions={transactions}
               />
             </div>
-            
             <div>
-              <ActionPanel 
+              <ActionPanel
                 isTransacting={isTransacting}
                 error={error}
                 onDeposit={handleDeposit}
                 onWithdraw={handleWithdraw}
               />
+              <br />
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Swap USDC.e
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Need USDC.e? Use our integrated swap feature to quickly acquire USDC.e for deposits.
+                </p>
+                <a
+                  href="https://app.xspswap.finance/#/swap"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
+                >
+                  Swap Now
+                  <ArrowRight className="ml-2" size={16} />
+                </a>
+              </div>
             </div>
-          </div>
+            </div>
         </main>
       </div>
     </ThemeProvider>
