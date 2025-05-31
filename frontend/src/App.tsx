@@ -171,16 +171,17 @@ function App() {
                 transactions={transactions}
               />
             </div>
-            <div>
-              <BridgeWidget
-                provider={provider}
-                account={account}
-              />
+            <div  className=" space-y-6">
+              
               <ActionPanel
                 isTransacting={isTransacting}
                 error={error}
                 onDeposit={handleDeposit}
                 onWithdraw={handleWithdraw}
+              />
+              <BridgeWidget
+                provider={provider}
+                account={account}
               />
             </div>
           </div>
