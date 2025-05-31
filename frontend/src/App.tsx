@@ -1,5 +1,4 @@
-import React from "react";
-import { CivicAuthProvider, UserButton } from "@civic/auth/react";
+import { CivicAuthProvider, UserButton } from "@civic/auth-web3/react";
 import { ThemeProvider } from "./context/ThemeContext";
 import useWallet from "./hooks/useWallet";
 import useVault from "./hooks/useVault";
@@ -7,6 +6,7 @@ import Header from "./components/Header";
 import VaultOverview from "./components/VaultOverview";
 import StrategyList from "./components/StrategyList";
 import ActionPanel from "./components/ActionPanel";
+import BridgeWidget from './components/BridgeWidget';
 import WalletDetails from "./components/WalletDetails";
 import { ArrowRight, Shield, Zap, BarChart } from "lucide-react";
 
@@ -172,30 +172,16 @@ function App() {
               />
             </div>
             <div>
+              <BridgeWidget
+                provider={provider}
+                account={account}
+              />
               <ActionPanel
                 isTransacting={isTransacting}
                 error={error}
                 onDeposit={handleDeposit}
                 onWithdraw={handleWithdraw}
               />
-              <br />
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                  Swap USDC.e
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Need USDC.e? Use swap feature to quickly acquire USDC.e for deposits.
-                </p>
-                <a
-                  href="https://app.xspswap.finance/#/swap"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
-                >
-                  Swap Now
-                  <ArrowRight className="ml-2" size={16} />
-                </a>
-              </div>
             </div>
           </div>
         </main>

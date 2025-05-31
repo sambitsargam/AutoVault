@@ -51,7 +51,7 @@ const VaultOverview: React.FC<VaultOverviewProps> = ({
                   {isLoading ? (
                     <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                   ) : (
-                    `${formatNumber(shareValue, 6)} vUSDC.e`
+                    `${formatNumber(tvl, 6)} vUSDC.e`
                   )}
                 </div>
               </div>
