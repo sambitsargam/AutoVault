@@ -3,9 +3,9 @@ import { Contract, formatUnits, parseUnits } from 'ethers';
 import { ArrowDownUp, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 const CHAIN_INFO = {
-  1: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
-  42161: { name: 'Arbitrum', symbol: 'ETH', decimals: 18 },
-  50: { name: 'XDC', symbol: 'XDC', decimals: 18 }
+  1: { name: 'Ethereum', symbol: 'ETH', decimals: 18, usdc: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
+  42161: { name: 'Arbitrum', symbol: 'ETH', decimals: 18, usdc: '0xaf88d065e77c8cc2239327c5edb3a432268e5831' },
+  50: { name: 'XDC', symbol: 'XDC', decimals: 18, usdc: '0x2a8e898b6242355c290e1f4fc966b8788729a4d4' }
 };
 
 const LOCKER_ABI = [
@@ -27,14 +27,9 @@ const MINTER_MANAGER_ABI = [
   'function minterAllowance(address) external view returns (uint256)'
 ];
 
-interface BridgeWidgetProps {
-  provider: any; // Replace 'any' with the actual provider type if available, e.g., ethers.providers.Web3Provider
-  account: string;
-}
-
-const BridgeWidget: React.FC<BridgeWidgetProps> = ({ provider, account }) => {
-  const [sourceChain, setSourceChain] = useState(1);
-  const [destChain, setDestChain] = useState(50);
+const BridgeWidget = ({ provider, account }) => {
+  const [sourceChain, setSourceChain] = useState(50); // Default from XDC
+  const [destChain, setDestChain] = useState(1); // Default to Ethereum
   const [amount, setAmount] = useState('');
   const [fee, setFee] = useState('0');
   const [availableBalance, setAvailableBalance] = useState('0');
@@ -105,9 +100,7 @@ const BridgeWidget: React.FC<BridgeWidgetProps> = ({ provider, account }) => {
       const isFromNative = sourceChain === 1 || sourceChain === 42161;
       const signer = provider.getSigner();
 
-      const usdcAddress = isFromNative
-        ? '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-        : '0x2a8e898b6242355c290e1f4fc966b8788729a4d4';
+      const usdcAddress = CHAIN_INFO[sourceChain].usdc;
 
       const usdcContract = new Contract(
         usdcAddress,
@@ -151,11 +144,7 @@ const BridgeWidget: React.FC<BridgeWidgetProps> = ({ provider, account }) => {
       setAmount('');
     } catch (err) {
       console.error('Bridge transaction failed:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Bridge transaction failed');
-      }
+      setError(err.message || 'Bridge transaction failed');
     } finally {
       setIsLoading(false);
     }
@@ -166,144 +155,96 @@ const BridgeWidget: React.FC<BridgeWidgetProps> = ({ provider, account }) => {
     setDestChain(sourceChain);
   };
 
-  if (!provider || !account) {
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-          Bridge USDC
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          Please connect your wallet to use the bridge.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-      <div className="px-6 py-5">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-          <ArrowDownUp size={20} className="mr-2 text-blue-500" />
-          Bridge USDC
-        </h2>
+    <div className="max-w-lg mx-auto p-6 bg-blue-50 dark:bg-blue-900 rounded shadow space-y-4">
+      <h2 className="text-xl font-bold flex items-center gap-2 text-blue-800 dark:text-white">
+        <ArrowDownUp size={20} className="text-blue-600" />
+        Bridge USDC
+      </h2>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between space-x-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                From
-              </label>
-              <select
-                value={sourceChain}
-                onChange={(e) => setSourceChain(Number(e.target.value))}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value={1}>Ethereum</option>
-                <option value={42161}>Arbitrum</option>
-                <option value={50}>XDC</option>
-              </select>
-            </div>
-
-            <button
-              onClick={swapChains}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <ArrowDownUp size={20} className="text-blue-500" />
-            </button>
-
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                To
-              </label>
-              <select
-                value={destChain}
-                onChange={(e) => setDestChain(Number(e.target.value))}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value={1}>Ethereum</option>
-                <option value={42161}>Arbitrum</option>
-                <option value={50}>XDC</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Amount (USDC)
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Available: {availableBalance} USDC
-            </div>
-          </div>
-
-          {fee !== '0' && (
-            <div className="text-sm text-gray-600 dark:text-gray-300">
-              Bridge fee: {fee} {(CHAIN_INFO as Record<number, { name: string; symbol: string; decimals: number }>)[sourceChain].symbol}
-            </div>
-          )}
-
-          {isPaused && (
-            <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3">
-              <div className="flex">
-                <AlertCircle className="h-5 w-5 text-yellow-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                    Bridge is currently paused
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
-              <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {success && (
-            <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-3">
-              <div className="flex">
-                <CheckCircle2 className="h-5 w-5 text-green-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-green-700 dark:text-green-300">
-                    Bridge transaction successful!
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={handleBridge}
-            disabled={isLoading || isPaused || !amount || Number(amount) <= 0 || Number(amount) > Number(availableBalance)}
-            className="w-full py-2 px-4 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-1">
+          <label className="block text-sm mb-1 text-blue-900 dark:text-white">From</label>
+          <select
+            value={sourceChain}
+            onChange={(e) => setSourceChain(Number(e.target.value))}
+            className="w-full p-2 rounded border border-blue-300 dark:border-blue-600"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                Processing...
-              </>
-            ) : (
-              'Bridge USDC'
-            )}
-          </button>
+            <option value={1}>Ethereum</option>
+            <option value={42161}>Arbitrum</option>
+            <option value={50}>XDC</option>
+          </select>
+        </div>
+
+        <button onClick={swapChains} className="p-2 mt-5 hover:bg-blue-200 dark:hover:bg-blue-700 rounded-full">
+          <ArrowDownUp size={20} className="text-blue-800 dark:text-white" />
+        </button>
+
+        <div className="flex-1">
+          <label className="block text-sm mb-1 text-blue-900 dark:text-white">To</label>
+          <select
+            value={destChain}
+            onChange={(e) => setDestChain(Number(e.target.value))}
+            className="w-full p-2 rounded border border-blue-300 dark:border-blue-600"
+          >
+            <option value={1}>Ethereum</option>
+            <option value={42161}>Arbitrum</option>
+            <option value={50}>XDC</option>
+          </select>
         </div>
       </div>
+
+      <div>
+        <label className="block text-sm mb-1 text-blue-900 dark:text-white">Amount (USDC)</label>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="w-full p-2 rounded border border-blue-300 dark:border-blue-600"
+          placeholder="0.00"
+        />
+        <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">Available: {availableBalance} USDC</p>
+      </div>
+
+      {fee !== '0' && (
+        <p className="text-sm text-blue-700 dark:text-blue-200">Bridge fee: {fee} {CHAIN_INFO[sourceChain].symbol}</p>
+      )}
+
+      {isPaused && (
+        <div className="p-3 bg-yellow-100 dark:bg-yellow-800 rounded text-yellow-900 dark:text-yellow-100 flex items-center gap-2">
+          <AlertCircle size={18} />
+          Bridge is currently paused
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 bg-red-100 dark:bg-red-800 rounded text-red-900 dark:text-red-100 flex items-center gap-2">
+          <AlertCircle size={18} />
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="p-3 bg-green-100 dark:bg-green-800 rounded text-green-900 dark:text-green-100 flex items-center gap-2">
+          <CheckCircle2 size={18} />
+          Bridge transaction successful!
+        </div>
+      )}
+
+      <button
+        onClick={handleBridge}
+        disabled={isLoading || isPaused || !amount || Number(amount) <= 0 || Number(amount) > Number(availableBalance)}
+        className="w-full p-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 size={18} className="animate-spin" />
+            Processing...
+          </span>
+        ) : (
+          'Bridge USDC'
+        )}
+      </button>
     </div>
   );
 };
