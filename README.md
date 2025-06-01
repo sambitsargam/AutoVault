@@ -1,4 +1,4 @@
-# USDC.e Auto-Yield Vault
+# AutoVault
 
 An AI‐driven DeFi vault on the XDC Network that automatically selects, compounds, and rebalances USDC.e yield strategies using a GPT‐powered advisor. Users deposit USDC.e to mint vUSDC.e shares; an autonomous agent fetches real‐time APYs, consults OpenAI to pick the safest, highest‐return strategy, and calls `harvest()`—all without manual intervention.
 
@@ -14,7 +14,7 @@ An AI‐driven DeFi vault on the XDC Network that automatically selects, compoun
 
 ## Project Overview
 
-**USDC.e Auto-Yield Vault** automates yield optimization on the XDC Network. Users deposit USDC.e into a vault contract and receive vUSDC.e shares. Behind the scenes:
+**AutoVault** automates yield optimization on the XDC Network. Users deposit USDC.e into a vault contract and receive vUSDC.e shares. Behind the scenes:
 
 - Three strategy contracts each report a real-time APY and implement a harvest function.  
 - A continuously running agent fetches those APYs hourly.  
@@ -25,10 +25,46 @@ An AI‐driven DeFi vault on the XDC Network that automatically selects, compoun
 
 ## Architecture
 
-
-\[ React Frontend ] ⇄ \[ Vault Contract (vUSDC.e) ] ⇄ \[ Strategy Modules ]
-↑                 ↓
-└─── AI Advisor + Rebalance Agent ───┘
+```
+           ┌────────────────────┐
+           │  React Frontend    │
+           │ (TVL, APYs, UI)    │
+           └─────────┬──────────┘
+                     │
+                     ▼
+           ┌────────────────────┐
+           │   Vault Contract   │
+           │     (vUSDC.e)      │
+           └─────────┬──────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
+┌────────────────┐        ┌────────────────┐
+│  Strategy A    │        │  Strategy B    │
+│ (AlphaYield)   │        │ (BetaBoost)    │
+└────────────────┘        └────────────────┘
+        │                         │
+        └──────┬─────────┬────────┘
+               │         │
+               ▼         ▼
+         ┌────────────────────┐
+         │  Strategy C        │
+         │ (GammaGrowth)      │
+         └─────────┬──────────┘
+                   │
+                   ▼
+         ┌────────────────────┐
+         │ Rebalance Agent    │
+         │  (Node.js Script)  │
+         └─────────┬──────────┘
+                   │
+                   ▼
+         ┌────────────────────┐
+         │   AI Advisor       │
+         │ (Express + GPT)    │
+         └────────────────────┘
+```
 
 
 - **React Frontend**: Displays TVL, APYs, recommended strategy, user shares/value, and deposit/withdraw controls.  
@@ -36,7 +72,6 @@ An AI‐driven DeFi vault on the XDC Network that automatically selects, compoun
 - **Strategy Modules**: Each contract reports a static or dynamic APY via `apy()` and provides a `harvestYield()` endpoint.  
 - **AI Advisor**: An Express‐based service wrapping OpenAI, receiving on-chain APYs and returning a JSON recommendation.  
 - **Rebalance Agent**: A Node.js script that fetches on-chain APYs, calls the AI Advisor, and executes `harvest()` on the vault with the chosen strategy.
-
 
 ## Features
 
@@ -74,7 +109,6 @@ An AI‐driven DeFi vault on the XDC Network that automatically selects, compoun
 
 - **Civic Auth Wallet Integration Bounty**  
   • Extendable to embed Civic KYC and secure wallets in the interface for compliant onboarding.  
-
 
 ## Contact
 
