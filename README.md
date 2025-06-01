@@ -1,6 +1,6 @@
 # AutoVault
 
-An AI‐driven DeFi vault on the XDC Network that automatically selects, compounds, and rebalances USDC.e yield strategies using a GPT‐powered advisor. Users deposit USDC.e to mint vUSDC.e shares; an autonomous agent fetches real‐time APYs, consults OpenAI to pick the safest, highest‐return strategy, and calls `harvest()`—all without manual intervention.
+An AI‐driven DeFi vault on the XDC Network that leverages **Civic Auth** for embedded wallet KYC and integrates the **USDC.e bridge** for seamless asset support. AutoVault automatically selects, compounds, and rebalances USDC.e yield strategies using a GPT‐powered advisor. Users deposit USDC.e to mint vUSDC.e shares; an autonomous agent fetches real‐time APYs, consults OpenAI to pick the safest, highest‐return strategy, and calls `harvest()`—all without manual intervention.
 
 
 ## Table of Contents
